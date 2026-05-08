@@ -11,28 +11,40 @@ jobs:
     runs-on: ubuntu-latest
     services:
       kafka:
-        image: bitnami/kafka:latest
+        image: confluentinc/cp-kafka:7.8.3
+        env:
+          KAFKA_KRAFT_MODE: 'true'
+          KAFKA_NODE_ID: 1
+          KAFKA_PROCESS_ROLES: broker,controller
+          KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+          KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+          KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
         ports:
           - 9092:9092
-u      order-db:
-        image: postgres:15
+      order-db:
+        image: postgres:15-alpine
         env:
-          POSTGRES_DB: order_db
-          POSTGRES_PASSWORD: password
+          POSTGRES_DB: saga
+          POSTGRES_USER: saga
+          POSTGRES_PASSWORD: saga
         ports:
           - 5432:5432
       inventory-db:
-        image: postgres:15
+        image: postgres:15-alpine
         env:
-          POSTGRES_DB: inventory_db
-          POSTGRES_PASSWORD: password
+          POSTGRES_DB: saga
+          POSTGRES_USER: saga
+          POSTGRES_PASSWORD: saga
         ports:
           - 5433:5432
       payment-db:
-        image: postgres:15
+        image: postgres:15-alpine
         env:
-          POSTGRES_DB: payment_db
-          POSTGRES_PASSWORD: password
+          POSTGRES_DB: saga
+          POSTGRES_USER: saga
+          POSTGRES_PASSWORD: saga
         ports:
           - 5434:5432
     steps:
